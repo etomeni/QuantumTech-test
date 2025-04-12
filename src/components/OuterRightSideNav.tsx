@@ -1,31 +1,31 @@
 'use client'
 
 import React, { useState } from 'react';
-import Image from "next/image";
+// import Image from "next/image";
+import { useRouter } from 'next/navigation';
 
 import { useForm } from 'react-hook-form';
 import * as yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useDropzone } from 'react-dropzone';
 
 import Box from '@mui/material/Box';
-// import colors from '@/constants/colors';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
-
-import apiClient, { apiErrorResponse } from '@/util/apiClient';
-import { defaultApiResponse } from '@/util/resources';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
-import { selectMuiStyle, textInputMuiTextFieldStyle } from '@/util/muiStyles';
 import CircularProgress from '@mui/material/CircularProgress';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
+
+import apiClient, { apiErrorResponse } from '@/util/apiClient';
+import { convertToBase64, defaultApiResponse } from '@/util/resources';
+import { selectMuiStyle, textInputMuiTextFieldStyle } from '@/util/muiStyles';
 import SnackbarToast, { SnackbarToastInterface } from './ToastNotification';
-import { IconButton } from '@mui/material';
 
 
 const formSchema = yup.object({
@@ -35,9 +35,16 @@ const formSchema = yup.object({
 });
 
 interface _Props {
+    id?: string;
+    image?: string;
+    firstName?: string;
+    lastName?: string;
+    occupation?: string;
+    // createdAt: string;
+    // updatedAt: string;
+
     closeNav: () => void,
 }
-
 
 const defaulToastNotification: SnackbarToastInterface = {
     status: "success",
@@ -45,29 +52,80 @@ const defaulToastNotification: SnackbarToastInterface = {
     message: '',
 }
 
-export default function OuterRightSideNav({ closeNav }: _Props) {
-
+export default function OuterRightSideNav({ 
+    closeNav,
+    id, image = '', firstName = '', lastName = "", occupation, // createdAt, updatedAt
+}: _Props) {
     const [apiResponse, setApiResponse] = useState(defaultApiResponse);
     const [toastNotification, setToastNotification] = useState(defaulToastNotification);
+    const router = useRouter();
+    const [previewImage, setPreviewImage] = useState(image ? image : '');
+    const [inputImage, setInputImage] = useState<any>();
 
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: {
+            'image/png': ['.png'],
+            'image/jpeg': ['.jpeg'],
+            'image/jpg': ['.jpg'],
+            'image/webp': ['.webp'],
+        },
+        onDrop: async (acceptedFiles) => {
+            const file = acceptedFiles[0];
 
+            setInputImage(file);
+            const base64 = await convertToBase64(file);
+            // console.log(base64.result);
+            setPreviewImage(base64.result);
+        },
+    });
+
+      
     const { 
         handleSubmit, register, reset, formState: { errors, isValid, isSubmitting } 
-    } = useForm({ resolver: yupResolver(formSchema), mode: 'onChange', reValidateMode: 'onChange' });
+    } = useForm({ 
+        resolver: yupResolver(formSchema),
+        mode: 'onChange', 
+        reValidateMode: 'onChange',
+        defaultValues: {
+            firstName, lastName, 
+            occupation: occupation ? occupation : '0'
+        }
+    });
 
+       
+    const handleFileUpload = async (e: any) => {
+        const file = e.target.files[0]; 
+        setInputImage(file);
+
+        const base64 = await convertToBase64(file);
+        // console.log(base64.result);
+        setPreviewImage(base64.result);
+    
+        e.target.value = "";
+    }
         
     const onSubmit = async (formData: typeof formSchema.__outputType) => {
         setApiResponse(defaultApiResponse);
 
         try {
-            const response = (await apiClient.post(`/contact/contact-us`, formData )).data;
-            // console.log(response);
+            let response: any;
 
-            // setApiResponse({
-            //     display: true,
-            //     status: true,
-            //     message: response.message
-            // });
+            if (id) {
+                response = (await apiClient.put(`/accounts/${id}`,
+                    {
+                        ...formData,
+                        ...(inputImage && { image: previewImage }),
+                    }
+                 )).data;
+            } else {
+                response = (await apiClient.post(`/accounts`, 
+                    {
+                        ...formData,
+                        ...(inputImage && { image: previewImage }),
+                    } 
+                )).data;
+            }
+            // console.log(response);
 
             setToastNotification({
                 display: true,
@@ -75,10 +133,23 @@ export default function OuterRightSideNav({ closeNav }: _Props) {
                 message: response.message
             });
 
+            setTimeout(() => {
+                router.refresh();
+                window.location.reload();
+            }, 1000);
+
             reset();
+            closeNav();
             
         } catch (error: any) {
-            const messageRes = apiErrorResponse(error, "Oooops, failed to send message. please try again.", true);
+            console.log(error);
+            const messageRes = apiErrorResponse(error, "Oooops, something went wrong. please try again.", true);
+
+            setApiResponse({
+                display: true,
+                status: false,
+                message: messageRes.message
+            });
 
             setToastNotification({
                 display: true,
@@ -125,7 +196,7 @@ export default function OuterRightSideNav({ closeNav }: _Props) {
                         letterSpacing: "0%",
                         // mt: 1,
                     }}
-                    >Add an account holder</Typography>
+                >{id ? "Edit" : "Add"} an account holder</Typography>
 
                 <Typography
                     sx={{
@@ -136,7 +207,7 @@ export default function OuterRightSideNav({ closeNav }: _Props) {
                         color: "#434343",
                         mt: 2,
                     }}
-                >Fill the details below in order to add an account holder.</Typography>
+                >Fill the details below in order to {id ? "edit" : "add"} an account holder.</Typography>
             </Box>
 
             <Box
@@ -147,15 +218,47 @@ export default function OuterRightSideNav({ closeNav }: _Props) {
             >
                 <Stack direction="column" p="20px"
                     alignItems='center' justifyContent="center" my={3}
+                    onClick={() => document.getElementById("image")?.click()}
+                    sx={{cursor: "pointer", width: "fit-content", mx: "auto"}}
+                    {...getRootProps()}
                 >
-                    <Image
-                        // className="dark:invert"
-                        src="/uploadIcon.png"
-                        alt="logo"
-                        width={143}
-                        height={143}
-                        priority
+                    <input 
+                        type="file" 
+                        id='image' 
+                        name="image" 
+                        accept="image/jpeg, image/jpg, image/png, image/webp"
+                        {...getInputProps()} 
+                        onChange={handleFileUpload}
+                        style={{display: "none"}}
                     />
+
+                    <Box height="143px" width="143px"
+                        sx={{
+                            width: "143px",
+                            height: "143px",
+                            overflow: "hidden",
+                            bgcolor: "#F8FFF4",
+                            border: "1px dashed #19A752",
+                            borderRadius: "50%",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}
+                    >
+                        <img
+                            // className="dark:invert"
+                            src={previewImage ? previewImage : "/uploadIcon.png"} 
+                            alt="account image"
+
+                            style={{
+                                maxWidth: "140px",
+                                maxHeight: "140px",
+                                objectFit: "fill",
+                                margin: "auto"
+                            }}
+                        />
+                    </Box>
 
                     <Typography
                         sx={{
@@ -249,7 +352,7 @@ export default function OuterRightSideNav({ closeNav }: _Props) {
 
                                 <FormControl fullWidth>
                                     <Select
-                                        defaultValue="0"
+                                        defaultValue={occupation ? occupation : "0"}
                                         // value={language}
                                         error={ errors.occupation ? true : false }
 
@@ -363,8 +466,7 @@ export default function OuterRightSideNav({ closeNav }: _Props) {
                 </Box>
 
             </Box>
-
-
+            
 
             <SnackbarToast 
                 status={toastNotification.status} 
@@ -372,6 +474,7 @@ export default function OuterRightSideNav({ closeNav }: _Props) {
                 message={toastNotification.message} 
                 closeSnackbar={() => setToastNotification(defaulToastNotification)}
             />
+
         </Box>
     )
 }
