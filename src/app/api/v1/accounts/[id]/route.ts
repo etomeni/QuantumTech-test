@@ -3,9 +3,14 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { deleteImageFileFromCloudinary, uploadToCloudinary } from '@/lib/cloudinary';
 
-export async function GET(req: Request, context: { params: { id: string } }) {
+export async function GET(request: Request) {
     try {
-        const { id } = await context.params;
+        const url = new URL(request.url)
+        const pathSegments = url.pathname.split('/')
+        const id = pathSegments[pathSegments.length - 1]
+
+        // Or you can use regex to extract the ID more cleanly if needed.
+
 
         const account = await prisma.account.findUnique({
             where: { id: id },
@@ -36,9 +41,11 @@ export async function GET(req: Request, context: { params: { id: string } }) {
     }
 }
 
-export async function PUT(req: Request, context: { params: { id: string } }) {
+
+export async function PUT(req: Request) {
     try {
-        const { id } = await context.params;
+        const url = new URL(req.url)
+        const id = url.pathname.split('/').pop() // Gets the [id] from the URL
 
         const data = await req.json();
         // const { firstName, lastName, occupation } = data;
@@ -93,51 +100,10 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     }
 }
 
-// export async function PUT(req: NextRequest) {
-//     try {
-//         const body = await req.json();
-//         const { id, firstName, lastName, occupation, image } = body;
-
-//         if (!id) {
-//             return NextResponse.json({
-//                 status: false,
-//                 statusCode: 400,
-//                 result: null,
-//                 message: 'Account ID is required',
-//             }, { status: 400 });
-//         }
-
-//         const account = await prisma.account.update({
-//             where: { id },
-//             data: {
-//                 ...(firstName && { firstName }),
-//                 ...(lastName && { lastName }),
-//                 ...(occupation && { occupation }),
-//                 ...(image && { image }),
-//             },
-//         });
-
-//         return NextResponse.json({
-//             status: true,
-//             statusCode: 200,
-//             result: account,
-//             message: 'Account updated successfully',
-//         });
-
-//     } catch (error) {
-//         return NextResponse.json({
-//             status: false,
-//             statusCode: 500,
-//             result: null,
-//             message: 'Internal server error',
-//         }, { status: 500 });
-//     }
-// }
-
-
-export async function DELETE(req: Request, context: { params: { id: string } }) {
+export async function DELETE(req: Request) {
     try {
-        const { id } = await context.params;
+        const url = new URL(req.url)
+        const id = url.pathname.split('/').pop() // Gets the [id] from the URL
 
         // Fetch the account from the database
         const account = await prisma.account.findUnique({
