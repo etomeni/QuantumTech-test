@@ -1,8 +1,8 @@
-import Alert from '@mui/material/Alert';
+// import Alert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
-import Box from '@mui/material/Box';
+// import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -27,12 +27,6 @@ const SnackbarToast: React.FC<SnackbarToastInterface> = ({
     message, display, status, duration = 3000, closeSnackbar = () => {}, 
     position = {vertical: "top", horizontal: "right"}
 }) => {
-    let openMsgResponse = {
-        display: display,
-        status: status,
-        message: message
-    }
-
 
     const snackbarAction = (
         <IconButton
@@ -48,22 +42,22 @@ const SnackbarToast: React.FC<SnackbarToastInterface> = ({
     return (
         <Snackbar
             anchorOrigin={position}
-            open={openMsgResponse.display}
+            open={display}
             autoHideDuration={duration}
             onClose={() => closeSnackbar()}
-            message={openMsgResponse.message}
+            message={message}
             action={snackbarAction}
         >
             <Stack flexDirection="row" alignItems="center" justifyContent="space-between"
                 sx={{
                     gap: "10px",
                     padding: "14px",
-                    background: `${openMsgResponse.status == "success" ? "#F8FFF4" : "#FFF1F1"}`,
-                    border: `1px solid ${openMsgResponse.status == "success" ? '#329902' : "#DF0000"}`,
+                    background: `${status == "success" ? "#F8FFF4" : "#FFF1F1"}`,
+                    border: `1px solid ${status == "success" ? '#329902' : "#DF0000"}`,
                     borderRadius: "14px",
                 }}      
             >
-                { openMsgResponse.status == "success" 
+                { status == "success" 
                     ? <CheckCircleIcon sx={{ color: "#329902"}} /> 
                     : <CancelIcon sx={{ color: "#DF0000"}} /> 
                 }
@@ -75,7 +69,7 @@ const SnackbarToast: React.FC<SnackbarToastInterface> = ({
                         fontSize: "14px",
                         flexGrow: 1
                     }}
-                >{ openMsgResponse.message }</Typography>
+                >{ message }</Typography>
 
                 <CloseIcon sx={{ color: "#434343" }} 
                     onClick={() => closeSnackbar()}

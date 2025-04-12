@@ -88,7 +88,7 @@ export const convertToBase64 = (file: File): Promise<base64Interface> => {
             });
         }
 
-        fileReader.onerror = (_error) => {
+        fileReader.onerror = () => {
             resolve({
                 display: true,
                 status: false,

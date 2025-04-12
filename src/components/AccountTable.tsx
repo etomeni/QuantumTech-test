@@ -20,7 +20,7 @@ import TableBody from '@mui/material/TableBody';
 import TablePagination from '@mui/material/TablePagination';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
-import { defaultApiResponse, formatDate } from '@/util/resources';
+import { formatDate } from '@/util/resources';
 import apiClient, { apiErrorResponse } from '@/util/apiClient';
 import SnackbarToast, { SnackbarToastInterface } from './ToastNotification';
 import NoAccount from './NoAccount';
@@ -58,7 +58,7 @@ export default function AccountTable({
     const [limitNo, setLimitNo] = useState(10);
     const [currentPageNo, setCurrentPageNo] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+    // const [totalPages, setTotalPages] = useState(1);
     // const [isSubmitting, setIsSubmitting] = useState(false);
 
     // const [apiResponse, setApiResponse] = useState(defaultApiResponse);
@@ -88,7 +88,7 @@ export default function AccountTable({
 
             setLimitNo(response.result.meta.limit);
             setCurrentPageNo(response.result.meta.page);
-            setTotalPages(response.result.meta.totalPages);
+            // setTotalPages(response.result.meta.totalPages);
             setTotalRecords(response.result.meta.total);
     
         } catch (error: any) {
@@ -180,7 +180,6 @@ export default function AccountTable({
                                                                 // width: "45px", height: "45px",
                                                                 // mb: 3
                                                             }}
-                                                            // children={<AccountCircleOutlinedIcon sx={{ color: "#19A752"}} />}
                                                         />
                                                     </TableCell>
                 

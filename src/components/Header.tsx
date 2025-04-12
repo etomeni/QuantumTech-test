@@ -46,8 +46,9 @@ export default function Header({ fullName = "Nike Adesanoye", badgeCount = 2 }: 
                                 width: "40px", height: "40px",
                                 cursor: "pointer"
                             }}
-                            children={<NotificationsOutlinedIcon sx={{ color: "#211F1F"}} />}
-                        />
+                        >
+                            <NotificationsOutlinedIcon sx={{ color: "#211F1F"}} />
+                        </Avatar>
                     </Badge>
                 </Box>
             </Box>
@@ -61,9 +62,9 @@ export default function Header({ fullName = "Nike Adesanoye", badgeCount = 2 }: 
                         bgcolor: stringToColor(fullName),
                         width: "40px", height: "40px",
                     }}
-                    children={<Typography sx={{
-                    }}>{stringAvatar(fullName)}</Typography>}
-                />
+                >
+                    <Typography>{stringAvatar(fullName)}</Typography>
+                </Avatar>
 
                 <Typography
                     sx={{

@@ -12,7 +12,6 @@ import Drawer from '@mui/material/Drawer';
 import OuterRightSideNav from '@/components/OuterRightSideNav';
 
 
-
 export default function NoAccount() {
 	const [openRightNav, setOpenRightNav] = useState(false);
 
@@ -28,8 +27,9 @@ export default function NoAccount() {
                         width: "95px", height: "95px",
                         mb: 3
                     }}
-                    children={<AccountCircleOutlinedIcon sx={{ color: "#19A752", fontSize: "50px"}} />}
-                />
+                >
+                    <AccountCircleOutlinedIcon sx={{ color: "#19A752", fontSize: "50px"}} />
+                </Avatar>
                 
                 <Typography
                     sx={{

@@ -49,8 +49,9 @@ export default function AccountDetails({
                         width: "95px", height: "95px",
                         mb: 3
                     }}
-                    children={<AccountCircleOutlinedIcon sx={{ color: "#19A752", fontSize: "50px"}} />}
-                />
+                >
+                    <AccountCircleOutlinedIcon sx={{ color: "#19A752", fontSize: "50px"}} />
+                </Avatar>
                 
                 <Typography
                     sx={{

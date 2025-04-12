@@ -27,7 +27,7 @@ apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         // const { refreshToken, _handleRefreshToken, _logOutUser } = useUserStore.getState();
-        const originalRequest = error.config;
+        // const originalRequest = error.config;
 
         // if (error.response?.status === 419 && refreshToken && !originalRequest._retry) {
         //     originalRequest._retry = true;
@@ -72,6 +72,7 @@ export function apiErrorResponse(error: any, defaultErrorMsg = "Ooops and error 
     // const _setToastNotification  = useSettingStore.getState()._setToastNotification;
     
     const err = error.response && error.response.data ? error.response.data : error;
+    console.log(displayToastMsg);
     console.log(err);
   
     const messageRes = err.errors && err.length ? err[0].message : err.message || defaultErrorMsg;

@@ -17,6 +17,7 @@ export const uploadToCloudinary = async (base64: string) => {
         
         return uploaded.secure_url;
     } catch (error) {
+        console.log(error);
         throw new Error('Image upload failed');
     }
 };
@@ -68,6 +69,7 @@ export const deleteImageFileFromCloudinary = async (url: string) => {
         return result.result === 'ok';
         // return publicId;
     } catch (err) {
+        console.log(err);
         return false;
         // throw new Error('Failed to extract public ID from URL');
     }
